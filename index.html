@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <title>2025 Recall Interactive Map</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
     .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
@@ -25,127 +22,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    // Map setup
-    const taiwanBounds = [[21.5, 119.0], [25.5, 123.0]];
-    const map = L.map('map', {
-      maxBounds: taiwanBounds,
-      maxBoundsViscosity: 1.0,
-      minZoom: 7,
-      maxZoom: 10
-    }).setView([23.7, 121.0], 7);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'© OpenStreetMap contributors'
-    }).addTo(map);
-
-    const areas = [
-      // July 26 cases with updated electorate and 25% threshold
-      { name:'Lin Pei‑hsiang (Keelung Mayor)', date:'07/26', latlng:[25.1290,121.7400], color:'red',
-        info:{ party:'KMT', electorate:303980, threshold:75995, electionRate:0 } },
-      { name:'Wang Hung‑wei (Taipei Dist. 3)', date:'07/26', latlng:[25.0630,121.5410], color:'red',
-        info:{ party:'KMT', electorate:274312, threshold:68578, electionRate:0 } },
-      { name:'Li Yen‑hsiu (Taipei Dist. 4)', date:'07/26', latlng:[25.0690,121.5910], color:'red',
-        info:{ party:'KMT', electorate:311887, threshold:77972, electionRate:0 } },
-      { name:'Luo Chih‑chiang (Taipei Dist. 6)', date:'07/26', latlng:[25.0270,121.5430], color:'red',
-        info:{ party:'KMT', electorate:228981, threshold:57246, electionRate:0 } },
-      { name:'Hsu Chiao‑hsin (Taipei Dist. 7)', date:'07/26', latlng:[25.0412,121.5168], color:'red',
-        info:{ party:'KMT', electorate:231139, threshold:57785, electionRate:0 } },
-      { name:'Lai Shih‑pao (Taipei Dist. 8)', date:'07/26', latlng:[25.0180,121.5290], color:'red',
-        info:{ party:'KMT', electorate:244753, threshold:61189, electionRate:0 } },
-      { name:'Hung Meng‑kai (New Taipei Dist. 1)', date:'07/26', latlng:[25.1740,121.4460], color:'red',
-        info:{ party:'KMT', electorate:405060, threshold:101265, electionRate:0 } },
-      { name:'Yeh Yuan‑jhih (New Taipei Dist. 7)', date:'07/26', latlng:[25.0090,121.4580], color:'red',
-        info:{ party:'KMT', electorate:231042, threshold:57761, electionRate:0 } },
-      { name:'Chang Chih‑lung (New Taipei Dist. 8)', date:'07/26', latlng:[24.9940,121.5030], color:'red',
-        info:{ party:'KMT', electorate:288291, threshold:72073, electionRate:0 } },
-      { name:'Lin Te‑fu (New Taipei Dist. 9)', date:'07/26', latlng:[25.0120,121.5150], color:'red',
-        info:{ party:'KMT', electorate:237380, threshold:59345, electionRate:0 } },
-      { name:'Liao Hsien‑hsien (New Taipei Dist. 12)', date:'07/26', latlng:[24.9900,121.4600], color:'red',
-        info:{ party:'KMT', electorate:266243, threshold:66561, electionRate:0 } },
-      { name:'Niu Xu‑ting (Taoyuan Dist. 1)', date:'07/26', latlng:[25.0640,121.2970], color:'red',
-        info:{ party:'KMT', electorate:354065, threshold:88517, electionRate:0 } },
-      { name:'Tu Chuan‑chi (Taoyuan Dist. 2)', date:'07/26', latlng:[24.9790,121.1040], color:'red',
-        info:{ party:'KMT', electorate:316423, threshold:79106, electionRate:0 } },
-      { name:'Lu Ming‑che (Taoyuan Dist. 3)', date:'07/26', latlng:[24.9570,121.2230], color:'red',
-        info:{ party:'KMT', electorate:309001, threshold:77251, electionRate:0 } },
-      { name:'Wan Mei‑ling (Taoyuan Dist. 4)', date:'07/26', latlng:[25.0120,121.3010], color:'red',
-        info:{ party:'KMT', electorate:306688, threshold:76672, electionRate:0 } },
-      { name:'Lu Yu‑ling (Taoyuan Dist. 5)', date:'07/26', latlng:[24.9000,121.2020], color:'red',
-        info:{ party:'KMT', electorate:282711, threshold:70678, electionRate:0 } },
-      { name:'Chiu Jo‑hua (Taoyuan Dist. 6)', date:'07/26', latlng:[24.9500,121.2890], color:'red',
-        info:{ party:'KMT', electorate:285041, threshold:71261, electionRate:0 } },
-      { name:'Cheng Cheng‑chien (Hsinchu City)', date:'07/26', latlng:[24.8045,120.9680], color:'red',
-        info:{ party:'KMT', electorate:357063, threshold:89266, electionRate:0 } },
-      { name:'Liao Wei‑hsiang (Taichung Dist. 4)', date:'07/26', latlng:[24.1570,120.6410], color:'red',
-        info:{ party:'KMT', electorate:337718, threshold:84430, electionRate:0 } },
-      { name:'Huang Chien‑hao (Taichung Dist. 5)', date:'07/26', latlng:[24.1660,120.6900], color:'red',
-        info:{ party:'KMT', electorate:374348, threshold:93587, electionRate:0 } },
-      { name:'Luo Ting‑wei (Taichung Dist. 6)', date:'07/26', latlng:[24.1350,120.6860], color:'red',
-        info:{ party:'KMT', electorate:277436, threshold:69359, electionRate:0 } },
-      { name:'Ting Hsueh‑chung (Yunlin Dist. 1)', date:'07/26', latlng:[23.7090,120.3130], color:'red',
-        info:{ party:'KMT', electorate:271663, threshold:67916, electionRate:0 } },
-      { name:'Fu Kun‑chi (Hualien County)', date:'07/26', latlng:[23.9870,121.6010], color:'red',
-        info:{ party:'KMT', electorate:191367, threshold:47842, electionRate:0 } },
-      { name:'Huang Chien‑pin (Taitung County)', date:'07/26', latlng:[22.7550,121.1440], color:'red',
-        info:{ party:'KMT', electorate:113385, threshold:28347, electionRate:0 } },
-
-      // August 23 cases
-      { name:'Lo Ming‑cai (New Taipei Dist. 11)', date:'08/23', latlng:[25.0200,121.4600], color:'blue',
-        info:{ party:'KMT', electorate:296636, threshold:74159, electionRate:0 } },
-      { name:'Lin Su‑ming (Hsinchu County Dist. 2)', date:'08/23', latlng:[24.8400,121.0100], color:'blue',
-        info:{ party:'KMT', electorate:232865, threshold:58216, electionRate:0 } },
-      { name:'Yen Kuan‑heng (Taichung Dist. 2)', date:'08/23', latlng:[24.2200,120.6500], color:'blue',
-        info:{ party:'KMT', electorate:302779, threshold:75695, electionRate:0 } },
-      { name:'Yang Chiung‑ying (Taichung Dist. 3)', date:'08/23', latlng:[24.1800,120.6900], color:'blue',
-        info:{ party:'KMT', electorate:260251, threshold:65063, electionRate:0 } },
-      { name:'Chiang Chi‑chen (Taichung Dist. 8)', date:'08/23', latlng:[24.1500,120.6700], color:'blue',
-        info:{ party:'KMT', electorate:210595, threshold:52649, electionRate:0 } },
-      { name:'Ma Wen‑chun (Nantou Dist. 1)', date:'08/23', latlng:[23.9500,120.9500], color:'blue',
-        info:{ party:'KMT', electorate:186220, threshold:46555, electionRate:0 } },
-      { name:'Yu Hao (Nantou Dist. 2)', date:'08/23', latlng:[23.9000,120.8200], color:'blue',
-        info:{ party:'KMT', electorate:198325, threshold:49581, electionRate:0 } }
-    ];
-
-    // Render markers & popups with Pie Chart
-    const markers = [];
-    areas.forEach((a,i) => {
-      const m = L.circleMarker(a.latlng,{
-        radius:8, color:a.color, fillColor:a.color, fillOpacity:0.6
-      }).addTo(map);
-      const cid = 'chart'+i;
-      const popup = `
-        <div style="text-align:center;font-size:14px">
-          <strong>${a.name} (${a.date})</strong><br>
-          Party: ${a.info.party}<br>
-          Electorate: ${a.info.electorate.toLocaleString()}<br>
-          25% Threshold: ${a.info.threshold.toLocaleString()}<br>
-          <canvas id="${cid}" class="popup-chart"></canvas>
-          <div style="font-size:12px;margin-top:4px;">2024 Election Vote Rate</div>
-        </div>`;
-      m.bindPopup(popup);
-      m.on('popupopen', () => {
-        const rate = a.info.electionRate;
-        const rest = 100 - rate;
-        new Chart(document.getElementById(cid).getContext('2d'), {
-          type:'pie',
-          data:{
-            labels:['Candidate','Others'],
-            datasets:[{ data:[rate,rest], backgroundColor:['#007bff','#e9ecef'] }]
-          },
-          options:{ plugins:{ legend:{ position:'bottom' } } }
-        });
-      });
-      markers.push(m);
-    });
-
-    // Filter by date
-    function filterByDate(d) {
-      markers.forEach((m,i) => {
-        (d==='all'||areas[i].date===d) ? m.addTo(map) : map.removeLayer(m);
-      });
-    }
-    filterByDate('all');
-  </script>
-</body>
-</html>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh_
