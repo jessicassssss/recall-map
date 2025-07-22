@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 年罷免互動地圖</title>
+  <title>2025 Recall Interactive Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
@@ -11,11 +11,11 @@
   </style>
 </head>
 <body>
-  <h2>2025 年罷免互動地圖</h2>
+  <h2>2025 Recall Interactive Map</h2>
   <div class="btn-group">
-    <button onclick="filterByDate('all')">顯示全部</button>
-    <button onclick="filterByDate('07/26')">只顯示 07/26</button>
-    <button onclick="filterByDate('08/23')">只顯示 08/23</button>
+    <button onclick="filterByDate('all')">Show All</button>
+    <button onclick="filterByDate('07/26')">July 26</button>
+    <button onclick="filterByDate('08/23')">August 23</button>
   </div>
   <div id="map"></div>
 
@@ -30,6 +30,7 @@
     }).addTo(map);
 
     let markers = [];
+
     function filterByDate(date) {
       markers.forEach(m => map.removeLayer(m));
       markers = [];
@@ -41,12 +42,11 @@
             fillColor: a.color,
             fillOpacity: 0.6
           }).addTo(map).bindPopup(`
-            <b>${a.name}（${a.date}）</b><br>
-            投票率：${a.info['投票率']}<br>
-            同意票：${a.info['同意票']}<br>
-            反對票：${a.info['反對票']}<br>
-            結果：${a.info['結果']}<br>
-            2022 當選票：${a.info['2022當選票']}
+            <b>${a.name} (${a.date})</b><br>
+            Party: ${a.party}<br>
+            Electorate: ${a.electorate}<br>
+            Threshold (25%): ${a.threshold}<br>
+            Election Rate 2024: ${a.electionRate}%
           `);
           markers.push(marker);
         }
@@ -60,19 +60,16 @@
       header: true,
       complete: function(results) {
         results.data.forEach(row => {
-          if (row['名稱'] && row['緯度'] && row['經度']) {
+          if (row["Latitude"] && row["Longitude"] && row["Name"]) {
             areas.push({
-              name: row['名稱'],
-              date: row['投票日期'],
-              latlng: [parseFloat(row['緯度']), parseFloat(row['經度'])],
-              color: row['投票日期'] === '07/26' ? 'red' : 'blue',
-              info: {
-                '投票率': row['投票率'],
-                '同意票': row['同意票'],
-                '反對票': row['反對票'],
-                '結果': row['結果'],
-                '2022當選票': row['2022當選票']
-              }
+              name: row["Name"],
+              date: row["Date"],
+              party: row["Party"],
+              electorate: row["Electorate"],
+              threshold: row["Threshold_25%"],
+              electionRate: row["ElectionRate_2024"],
+              latlng: [parseFloat(row["Latitude"]), parseFloat(row["Longitude"])],
+              color: row["Color"] || 'gray'
             });
           }
         });
