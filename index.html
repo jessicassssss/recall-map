@@ -1,27 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 Recall Interactive Map</title>
+  <title>2025 年罷免互動地圖</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
     .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
     #map { height:600px; width:100%; margin-top:12px; }
-    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
   </style>
 </head>
 <body>
-  <h2>2025 Recall Interactive Map</h2>
+  <h2>2025 年罷免互動地圖</h2>
   <div class="btn-group">
-    <button onclick="filterByDate('all')">Show All</button>
-    <button onclick="filterByDate('07/26')">July 26 Cases</button>
-    <button onclick="filterByDate('08/23')">August 23 Cases</button>
+    <button onclick="filterByDate('all')">顯示全部</button>
+    <button onclick="filterByDate('07/26')">只顯示 07/26</button>
+    <button onclick="filterByDate('08/23')">只顯示 08/23</button>
   </div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh_
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
+
+    const map = L.map('map').setView([23.8, 121], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let markers = [];
+    function filterByDate(date) {
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      areas.forEach(a => {
+        if (date === 'all' || a.date === date) {
+          const marker = L.circleMarker(a.latlng, {
+            radius: 8,
+            color: a.color,
+            fillColor: a.color,
+            fillOpacity: 0.6
+          }).addTo(map).bindPopup(`
+            <b>${a.name}（${a.date}）</b><br>
+            投票率：${a.info['投票率']}<br>
+            同意票：${a.info['同意票']}<br>
+            反對票：${a.info['反對票']}<br>
+            結果：${a.info['結果']}<br>
+            2022 當選票：${a.info['2022當選票']}
+          `);
+          markers.push(marker);
+        }
+      });
+    }
+
+    let areas = [];
+
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        results.data.forEach(row => {
+          if (row['名稱'] && row['緯度'] && row['經度']) {
+            areas.push({
+              name: row['名稱'],
+              date: row['投票日期'],
+              latlng: [parseFloat(row['緯度']), parseFloat(row['經度'])],
+              color: row['投票日期'] === '07/26' ? 'red' : 'blue',
+              info: {
+                '投票率': row['投票率'],
+                '同意票': row['同意票'],
+                '反對票': row['反對票'],
+                '結果': row['結果'],
+                '2022當選票': row['2022當選票']
+              }
+            });
+          }
+        });
+        filterByDate('all');
+      }
+    });
+  </script>
+</body>
+</html>
