@@ -8,74 +8,96 @@
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
     .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
     #map { height:600px; width:100%; margin-top:12px; }
+    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
   </style>
 </head>
 <body>
   <h2>2025 Recall Interactive Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
-    <button onclick="filterByDate('07/26')">July 26</button>
-    <button onclick="filterByDate('08/23')">August 23</button>
+    <button onclick="filterByDate('07/26')">July 26 Cases</button>
+    <button onclick="filterByDate('08/23')">August 23 Cases</button>
   </div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
-
     const map = L.map('map').setView([23.8, 121], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+
+    // ✅ Carto 英文版地圖圖層（有英文地名）
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
     }).addTo(map);
 
-    let markers = [];
+    const markers = [];
 
-    function filterByDate(date) {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-      areas.forEach(a => {
-        if (date === 'all' || a.date === date) {
-          const marker = L.circleMarker(a.latlng, {
-            radius: 8,
-            color: a.color,
-            fillColor: a.color,
-            fillOpacity: 0.6
-          }).addTo(map).bindPopup(`
-            <b>${a.name} (${a.date})</b><br>
-            Party: ${a.party}<br>
-            Electorate: ${a.electorate}<br>
-            Threshold (25%): ${a.threshold}<br>
-            Election Rate 2024: ${a.electionRate}%
-          `);
-          markers.push(marker);
-        }
-      });
-    }
-
-    let areas = [];
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
 
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
       complete: function(results) {
-        results.data.forEach(row => {
-          if (row["Latitude"] && row["Longitude"] && row["Name"]) {
-            areas.push({
-              name: row["Name"],
-              date: row["Date"],
-              party: row["Party"],
-              electorate: row["Electorate"],
-              threshold: row["Threshold_25%"],
-              electionRate: row["ElectionRate_2024"],
-              latlng: [parseFloat(row["Latitude"]), parseFloat(row["Longitude"])],
-              color: row["Color"] || 'gray'
+        const data = results.data;
+        data.forEach((row, i) => {
+          const lat = parseFloat(row.Latitude);
+          const lng = parseFloat(row.Longitude);
+          if (isNaN(lat) || isNaN(lng)) return; // Skip invalid rows
+
+          const marker = L.circleMarker([lat, lng], {
+            radius: 8,
+            color: row.Color,
+            fillColor: row.Color,
+            fillOpacity: 0.6
+          }).addTo(map);
+
+          const cid = 'chart' + i;
+          const popup = `
+            <div style="text-align:center;font-size:14px">
+              <strong>${row.Name} (${row.Date})</strong><br>
+              Party: ${row.Party}<br>
+              Electorate: ${Number(row.Electorate).toLocaleString()}<br>
+              25% Threshold: ${Number(row.Threshold_25%).toLocaleString()}<br>
+              <canvas id="${cid}" class="popup-chart"></canvas>
+              <div style="font-size:12px;margin-top:4px;">2024 Election Vote Rate</div>
+            </div>`;
+          marker.bindPopup(popup);
+          marker.on('popupopen', () => {
+            const rate = parseFloat(row.ElectionRate_2024 || 0);
+            const rest = 100 - rate;
+            new Chart(document.getElementById(cid).getContext('2d'), {
+              type: 'pie',
+              data: {
+                labels: ['Candidate', 'Others'],
+                datasets: [{
+                  data: [rate, rest],
+                  backgroundColor: ['#007bff', '#e9ecef']
+                }]
+              },
+              options: {
+                plugins: {
+                  legend: { position: 'bottom' }
+                }
+              }
             });
-          }
+          });
+
+          marker.rowDate = row.Date;
+          markers.push(marker);
         });
-        filterByDate('all');
       }
     });
+
+    function filterByDate(d) {
+      markers.forEach(m => {
+        (d === 'all' || m.rowDate === d) ? m.addTo(map) : map.remove();
+      });
+    }
+
+    filterByDate('all');
   </script>
 </body>
 </html>
