@@ -2,37 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 Taiwan Legislator Recalls Succeed!</title>
+  <title>2025 Recall Interactive Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
-    .btn-group button {
-      padding:8px 16px;
-      margin-right:8px;
-      cursor:pointer;
-      font-size: 16px;
-    }
+    .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
     #map { height:600px; width:100%; margin-top:12px; }
     .popup-chart { width:160px; height:160px; display:block; margin:auto; }
   </style>
 </head>
 <body>
-  <h2>2025 Taiwan Legislator Recalls Succeed!</h2>
+  <h2>2025 Recall Interactive Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
-    <button onclick="filterByDate('07/26')">July 26 Cases</button>
-    <button onclick="filterByDate('08/23')">August 23 Cases</button>
+    <button onclick="filterByDate('07/26')">July 26</button>
+    <button onclick="filterByDate('08/23')">August 23</button>
   </div>
   <div id="map"></div>
 
-  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
     const map = L.map('map').setView([23.8, 121], 7);
 
-    // English map tiles from Carto
+    // 英文地名底圖（Carto）
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
@@ -40,6 +34,7 @@
     }).addTo(map);
 
     const markers = [];
+
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
 
     Papa.parse(CSV_URL, {
@@ -65,17 +60,16 @@
 
           const cid = 'chart' + i;
           const popup = `
-            <div style="text-align:left; font-size:14px; max-width:220px;">
+            <div style="text-align:left; font-size:14px">
               <strong>${row.Name} (${row.Date})</strong><br>
               Party: ${row.Party}<br>
               Electorate: ${Number(row.Electorate).toLocaleString()}<br>
               25% Threshold: ${Number(row['Threshold_25%']).toLocaleString()}<br>
-              <br>
+              Agree: ${Number(row.Agree || 0).toLocaleString()}<br>
+              Disagree: ${Number(row.Disagree || 0).toLocaleString()}<br>
+              <strong>Voting Result: ${row.VotingResults || "N/A"}</strong><br><br>
               <strong>2024 Election Vote Rate</strong><br>
               <canvas id="${cid}" class="popup-chart"></canvas>
-              <div style="font-size:13px; text-align:center; margin-top:4px;">
-                Candidate / Others
-              </div>
             </div>`;
 
           marker.bindPopup(popup);
@@ -91,7 +85,7 @@
               },
               options: {
                 plugins: {
-                  legend: { display: false }
+                  legend: { position: 'bottom' }
                 }
               }
             });
