@@ -2,17 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 Recall Interactive Map</title>
+  <title>2025 Taiwan Legislature Recall Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { margin:0; padding:20px; font-family:Arial, sans-serif; }
-    .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
-    #map { height:600px; width:100%; margin-top:12px; }
-    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    #map { height: 600px; width: 100%; margin-top: 12px; }
+    .btn-group button {
+      padding: 8px 16px;
+      margin-right: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .popup-chart {
+      width: 160px;
+      height: 160px;
+      display: block;
+      margin: auto;
+    }
+    .footer-note {
+      font-size: 12px;
+      margin-top: 4px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h2>2025 Recall Interactive Map</h2>
+  <h2>2025 Taiwan Legislature Recall Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
     <button onclick="filterByDate('07/26')">July 26</button>
@@ -26,7 +41,7 @@
   <script>
     const map = L.map('map').setView([23.8, 121], 7);
 
-    // 英文地名底圖（Carto）
+    // 使用 Carto 英文地圖底圖
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
@@ -34,7 +49,6 @@
     }).addTo(map);
 
     const markers = [];
-
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
 
     Papa.parse(CSV_URL, {
@@ -47,9 +61,22 @@
           const lng = parseFloat(row.Longitude);
           if (isNaN(lat) || isNaN(lng)) return;
 
-          const rateStr = (row.ElectionRate_2024 || "").replace('%', '');
-          const rate = parseFloat(rateStr) || 0;
+          const rate = parseFloat((row.ElectionRate_2024 || "").replace('%', '')) || 0;
           const rest = Math.max(0, 100 - rate);
+          const cid = 'chart' + i;
+
+          const popupHTML = `
+            <div style="text-align:left;font-size:14px">
+              <strong>${row.Name} (${row.Date})</strong><br>
+              Party: ${row.Party}<br>
+              Electorate: ${Number(row.Electorate).toLocaleString()}<br>
+              25% Threshold: ${Number(row['Threshold_25%']).toLocaleString()}<br>
+              Agree: ${Number(row.Agree || 0).toLocaleString()}<br>
+              Disagree: ${Number(row.Disagree || 0).toLocaleString()}<br>
+              <strong>Voting Result: ${row["Voting Result"] || "N/A"}</strong><br><br>
+              <strong>2024 Election Vote Rate</strong><br>
+              <canvas id="${cid}" class="popup-chart"></canvas>
+            </div>`;
 
           const marker = L.circleMarker([lat, lng], {
             radius: 8,
@@ -58,21 +85,7 @@
             fillOpacity: 0.6
           }).addTo(map);
 
-          const cid = 'chart' + i;
-          const popup = `
-            <div style="text-align:left; font-size:14px">
-              <strong>${row.Name} (${row.Date})</strong><br>
-              Party: ${row.Party}<br>
-              Electorate: ${Number(row.Electorate).toLocaleString()}<br>
-              25% Threshold: ${Number(row['Threshold_25%']).toLocaleString()}<br>
-              Agree: ${Number(row.Agree || 0).toLocaleString()}<br>
-              Disagree: ${Number(row.Disagree || 0).toLocaleString()}<br>
-              <strong>Voting Results: ${row.Voting Results || "N/A"}</strong><br><br>
-              <strong>2024 Election Vote Rate</strong><br>
-              <canvas id="${cid}" class="popup-chart"></canvas>
-            </div>`;
-
-          marker.bindPopup(popup);
+          marker.bindPopup(popupHTML);
           marker.on('popupopen', () => {
             new Chart(document.getElementById(cid).getContext('2d'), {
               type: 'pie',
