@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 Taiwan Recall Map</title>
+  <title>2025 Taiwan Legislature Recall Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:20px; font-family:Arial, sans-serif; }
@@ -50,6 +50,7 @@
           const cid = 'chart' + i;
           const rate = parseFloat((row.ElectionRate_2024 || '').replace('%', '')) || 0;
           const rest = Math.max(0, 100 - rate);
+          const district = row.District ? ` (${row.District})` : '';
 
           const marker = L.circleMarker([lat, lng], {
             radius: 8,
@@ -60,13 +61,14 @@
 
           const popupHTML = `
             <div class="popup-info">
-              <strong>${row.Name} (${row.District}) (${row.Date})</strong><br>
+              <strong>${row.Name}${district} (${row.Date})</strong><br>
               Party: ${row.Party}<br>
               Electorate: ${Number(row.Electorate || 0).toLocaleString()}<br>
               25% Threshold: ${Number(row['Threshold_25%'] || 0).toLocaleString()}<br>
               Agree: ${row.Agree || 'N/A'}<br>
               Disagree: ${row.Disagree || 'N/A'}<br>
-              <strong>Voting Result: ${row["Voting Result"] || 'N/A'}</strong><br><br>
+              <strong>Voting Result: ${row['Voting Result'] || 'N/A'}</strong><br>
+              <br>
               <div class="popup-small"><strong>2024 Election Vote Rate</strong></div>
               <canvas id="${cid}" class="popup-chart"></canvas>
             </div>
