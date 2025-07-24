@@ -11,9 +11,36 @@
     .popup-chart { width:160px; height:160px; display:block; margin:auto; }
     .popup-info { font-size: 14px; line-height: 1.4; text-align: left; }
     .popup-small { font-size: 12px; margin-top: 10px; text-align: center; }
+    /* 多語下拉選單樣式 */
+    .lang-select {
+      position: fixed;
+      top: 24px;
+      right: 36px;
+      z-index: 1000;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 6px 12px;
+      font-size: 15px;
+      border: 1px solid #ddd;
+    }
+    @media (max-width: 600px) {
+      .lang-select { top: 10px; right: 10px; font-size:13px;}
+    }
   </style>
 </head>
 <body>
+  <!-- 多語下拉選單 -->
+  <select class="lang-select" onchange="if(this.value) window.location.href=this.value;">
+    <option value="">🌏 Language / 語言</option>
+    <option value="https://jessicassssss.github.io/recall-map-fr/">Français</option>
+    <option value="https://jessicassssss.github.io/recall-map-es/">Español</option>
+    <option value="https://jessicassssss.github.io/recall-map-de/">Deutsch</option>
+    <option value="https://jessicassssss.github.io/recall-map-ru/">Русский</option>
+    <option value="https://jessicassssss.github.io/recall-map-vn/">Tiếng Việt</option>
+    <option value="https://jessicassssss.github.io/recall-map-kr/">한국어</option>
+  </select>
+
   <h2>2025 Taiwan Legislature Recall Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
@@ -50,7 +77,6 @@
           const cid = 'chart' + i;
           const rate = parseFloat((row.ElectionRate_2024 || '').replace('%', '')) || 0;
           const rest = Math.max(0, 100 - rate);
-          const district = row.District ? ` (${row.District})` : '';
 
           const marker = L.circleMarker([lat, lng], {
             radius: 8,
@@ -61,8 +87,8 @@
 
           const popupHTML = `
             <div class="popup-info">
-              <strong>${row.Name}${district} (${row.Date})</strong><br>
-              Party: ${row.Party}<br>
+              <strong>${row.Name || ''} (${row.Date || ''})</strong><br>
+              Party: ${row.Party || ''}<br>
               Electorate: ${Number(row.Electorate || 0).toLocaleString()}<br>
               25% Threshold: ${Number(row['Threshold_25%'] || 0).toLocaleString()}<br>
               Agree: ${row.Agree || 'N/A'}<br>
