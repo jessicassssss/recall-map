@@ -43,8 +43,8 @@
   <h2>2025 Taiwan Legislature Recall Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
-    <button onclick="filterByDate('07/26')">July 26 Cases</button>
-    <button onclick="filterByDate('08/23')">August 23 Cases</button>
+    <button onclick="filterByDate('07/26')">July 26 Vote</button>
+    <button onclick="filterByDate('08/23')">August 23 Vote</button>
   </div>
   <div id="map"></div>
 
@@ -93,7 +93,7 @@
             <div class="popup-info">
               <strong>${row.Name || ''} (${row.Date || ''})</strong><br>
               Party: ${row.Party || ''}<br>
-              Votes Cast: ${formatNumber(row["Votes Cast"])}<br>
+              Electorate: ${formatNumber(row["Electorate"])}<br>
               25% Threshold: ${formatNumber(row["25% Threshold"])}<br>
               Agree: ${formatNumber(row["Agree"])}<br>
               Disagree: ${formatNumber(row["Disagree"])}<br>
