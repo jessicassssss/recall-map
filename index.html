@@ -1,28 +1,21 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>2025 타이완 선출직 공무원(입법원/지자체) 국민소환(파면)투표 지도</title>
+  <title>2025 Taiwan Legislature Recall Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { margin:0; padding:0; font-family:Arial, sans-serif; background:#fafbfc;}
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 0 0 0;
-      position: relative;
-      background: #fff;
-    }
-    .logo {
-      max-height: 44px;
-      margin: 0 12px;
-    }
+    body { margin:0; padding:20px; font-family:Arial, sans-serif; }
+    .btn-group button { padding:8px 16px; margin-right:8px; cursor:pointer; }
+    #map { height:600px; width:100%; margin-top:12px; }
+    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
+    .popup-info { font-size: 14px; line-height: 1.4; text-align: left; }
+    .popup-small { font-size: 12px; margin-top: 10px; text-align: center; }
     .lang-select {
       position: fixed;
-      top: 18px;
-      right: 20px;
-      z-index: 2000;
+      top: 24px;
+      right: 36px;
+      z-index: 1000;
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
@@ -31,106 +24,35 @@
       border: 1px solid #ddd;
     }
     @media (max-width: 600px) {
-      .topbar { padding: 5px 0 0 0;}
-      .logo { max-height: 32px;}
-      .lang-select { top: 8px; right: 8px; font-size:13px;}
-      .btn-group button { width: 100%; margin:6px 0 0 0; font-size:15px; }
-      h2 { font-size: 18px; }
-    }
-    .btn-group {
-      margin-bottom: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-    }
-    .btn-group button {
-      padding: 10px 20px;
-      margin-right: 0;
-      border: none;
-      border-radius: 8px;
-      background: #e8eefa;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .btn-group button:hover { background: #cbe2fa; }
-    #map { height: 60vh; min-height:400px; width:100%; margin-top:8px; z-index:1; }
-    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
-    .popup-info { font-size: 15px; line-height: 1.5; text-align: left; word-break:break-all; }
-    .popup-small { font-size: 12px; margin-top: 10px; text-align: center; }
-    /* loading spinner */
-    #loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: fixed;
-      left:0; top:0; width:100vw; height:100vh;
-      background:rgba(255,255,255,0.88);
-      z-index:3000;
-      font-size: 22px;
-      color: #1976d2;
-      font-weight: bold;
-      flex-direction: column;
-      pointer-events: none;
-    }
-    #resetView {
-      position:fixed;
-      left:20px; bottom:20px;
-      z-index:1200;
-      background: #fff;
-      border: 1px solid #1976d2;
-      color: #1976d2;
-      border-radius: 28px;
-      padding: 8px 20px;
-      font-size: 16px;
-      cursor:pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-      font-weight:bold;
-      transition: background 0.2s;
-    }
-    #resetView:hover { background:#f3f7fa; }
-    @media (max-width:600px){
-      #resetView { left:10px; bottom:10px; font-size:15px; padding: 7px 16px;}
+      .lang-select { top: 10px; right: 10px; font-size:13px;}
     }
   </style>
 </head>
 <body>
-  <!-- LOGO + 標題 -->
-  <div class="topbar">
-    <img class="logo" src="https://www.rti.org.tw/en/Static/image/enLogo.png" alt="RTI logo">
-  </div>
-  <!-- 語言選單 -->
+  <!-- Language dropdown -->
   <select class="lang-select" onchange="if(this.value) window.location.href=this.value;">
-    <option value="">🌏 언어 / Language</option>
-    <option value="https://jessicassssss.github.io/recall-map/">English</option>
+    <option value="">🌏 Language / 語言</option>
     <option value="https://jessicassssss.github.io/recall-map-fr/">Français</option>
     <option value="https://jessicassssss.github.io/recall-map-es/">Español</option>
     <option value="https://jessicassssss.github.io/recall-map-de/">Deutsch</option>
     <option value="https://jessicassssss.github.io/recall-map-ru/">Русский</option>
     <option value="https://jessicassssss.github.io/recall-map-vn/">Tiếng Việt</option>
-    <option value="https://jessicassssss.github.io/recall-map-kr/" selected>한국어</option>
+    <option value="https://jessicassssss.github.io/recall-map-kr/">한국어</option>
   </select>
-  <h2 style="text-align:center; margin-bottom:10px;">2025 타이완 선출직 공무원(입법원/지자체) 국민소환(파면)투표 지도</h2>
+
+  <h2>2025 Taiwan Legislature Recall Map</h2>
   <div class="btn-group">
-    <button onclick="filterByDate('all')">전체 표시</button>
-    <button onclick="filterByDate('07/26')">7월 26일 건</button>
-    <button onclick="filterByDate('08/23')">8월 23일 건</button>
+    <button onclick="filterByDate('all')">Show All</button>
+    <button onclick="filterByDate('07/26')">July 26 Cases</button>
+    <button onclick="filterByDate('08/23')">August 23 Cases</button>
   </div>
   <div id="map"></div>
-  <button id="resetView" onclick="resetView()">전체 지도</button>
-  <div id="loading"><div>지도를 불러오는 중...</div>
-    <svg width="52" height="52" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1976d2" stroke-width="4" stroke-linecap="round" stroke-dasharray="90 30" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1.2s" keyTimes="0;1" values="0 22 22;360 22 22"></animateTransform></circle></svg>
-  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    // loading
-    document.getElementById('loading').style.display = 'flex';
     const map = L.map('map').setView([23.8, 121], 7);
-    let initialView = [23.8, 121], initialZoom = 7;
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
@@ -138,7 +60,7 @@
       maxZoom: 19
     }).addTo(map);
 
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTZN0GTkRE06Q_iZLWEODmltyCS6RXm1Ray7547x4slfJTk8uddYusfPk3G0JjdxsnIxV1pnrnEwltb/pub?output=csv";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
     const markers = [];
 
     Papa.parse(CSV_URL, {
@@ -152,12 +74,12 @@
           if (isNaN(lat) || isNaN(lng)) return;
 
           const cid = 'chart' + i;
-          const rateStr = (row["2024 선거투표율"] || '').replace('%', '').replace(',', '.');
+          const rateStr = (row["% of Votes in 2024"] || '').replace('%', '').replace(',', '.');
           const rate = parseFloat(rateStr) || 0;
           const rest = Math.max(0, 100 - rate);
 
           function formatNumber(num) {
-            return Number(num || 0).toLocaleString('ko-KR');
+            return Number(num || 0).toLocaleString('en-US');
           }
 
           const marker = L.circleMarker([lat, lng], {
@@ -167,35 +89,27 @@
             fillOpacity: 0.6
           }).addTo(map);
 
-          // 點 popup 內容複製（UX亮點）
           const popupHTML = `
-            <div class="popup-info" style="user-select:all; cursor:pointer;" title="클릭하면 복사됩니다">
-              <strong>${row["이름"] || ''} (${row.Date || ''})</strong><br>
-              정당: ${row["정당"] || ''}<br>
-              유권자: ${formatNumber(row["유권자"])}<br>
-              25% 투표 기준: ${formatNumber(row["25% 투표 기준"])}<br>
-              찬성: ${formatNumber(row["찬성"])}<br>
-              반대: ${formatNumber(row["반대"])}<br>
-              <strong>투표 결과: ${row["투표 결과"] || 'N/A'}</strong><br>
+            <div class="popup-info">
+              <strong>${row.Name || ''} (${row.Date || ''})</strong><br>
+              Party: ${row.Party || ''}<br>
+              Votes Cast: ${formatNumber(row["Votes Cast"])}<br>
+              25% Threshold: ${formatNumber(row["25% Threshold"])}<br>
+              Agree: ${formatNumber(row["Agree"])}<br>
+              Disagree: ${formatNumber(row["Disagree"])}<br>
+              <strong>Results: ${row["Results"] || 'N/A'}</strong><br>
               <br>
-              <div class="popup-small"><strong>2024 선거투표율</strong></div>
+              <div class="popup-small"><strong>% of Votes in 2024</strong></div>
               <canvas id="${cid}" class="popup-chart"></canvas>
             </div>
           `;
           marker.bindPopup(popupHTML);
 
-          // Popup點擊內容複製
           marker.on('popupopen', () => {
-            const div = document.getElementById(cid).parentElement;
-            div.onclick = function() {
-              navigator.clipboard.writeText(div.innerText.replace(/\s+/g, ' ').trim());
-              div.title = "복사되었습니다!";
-              setTimeout(()=>{ div.title = "클릭하면 복사됩니다"; },1000);
-            };
             new Chart(document.getElementById(cid).getContext('2d'), {
               type: 'pie',
               data: {
-                labels: ['투표율', '기타'],
+                labels: ['Turnout (%)', 'Others'],
                 datasets: [{
                   data: [rate, rest],
                   backgroundColor: ['#007bff', '#e9ecef']
@@ -213,7 +127,6 @@
           markers.push(marker);
         });
 
-        document.getElementById('loading').style.display = 'none';
         filterByDate('all');
       }
     });
@@ -224,11 +137,6 @@
           ? m.addTo(map)
           : map.removeLayer(m);
       });
-      // 點選過後自動縮回全圖
-      setTimeout(()=>{ resetView(); },300);
-    }
-    function resetView() {
-      map.setView(initialView, initialZoom);
     }
   </script>
 </body>
