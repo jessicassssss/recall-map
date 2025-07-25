@@ -7,16 +7,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
-      --bg-main: #fafbfc;
-      --text-main: #212529;
-      --btn-bg: #e8eefa;
-      --btn-hover: #cbe2fa;
-      --box: #fff;
-      --select-bg: #fff;
-      --select-color: #222;
-      --popup-bg: #fff;
-      --popup-text: #212529;
-      --popup-border: #ccc;
+      --topbar-h: 46px;    /* logo區高度 */
+      --btn-h: 44px;       /* 功能鈕高度 */
+      --h2-h: 30px;        /* 標題高度 */
+      --gap: 16px;         /* 內部間隔 */
     }
     body.dark, :root.dark {
       --bg-main: #181c20;
@@ -35,13 +29,15 @@
       font-family:Arial, sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
+      height: 100vh;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
     .topbar {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-top: 8px;
-      padding-bottom: 2px;
+      height: var(--topbar-h);
       background: var(--box);
     }
     .logo {
@@ -69,7 +65,6 @@
       transition: background 0.3s, color 0.3s;
       outline: none;
     }
-    /* 浮動主題切換按鈕 */
     .mode-fab {
       position: fixed;
       left: 50%;
@@ -93,15 +88,13 @@
       outline: none;
       user-select: none;
     }
-    .mode-fab:active {
-      background: var(--btn-hover);
-    }
     .btn-group {
       margin-bottom: 8px;
       display: flex;
       gap: 8px;
       justify-content: center;
       flex-wrap: wrap;
+      height: var(--btn-h);
     }
     .btn-group button {
       padding: 8px 12px;
@@ -122,9 +115,12 @@
       font-weight: bold;
       letter-spacing: 0.5px;
       color: var(--text-main);
+      height: var(--h2-h);
+      line-height: var(--h2-h);
     }
     #map { 
-      height: 63vh; /* 稍微縮短 */
+      /* 桌機滿版: 扣掉logo、標題、btn、gap等 */
+      height: calc(100vh - var(--topbar-h) - var(--btn-h) - var(--h2-h) - var(--gap));
       min-height:300px;
       width:100%;
       margin-top:2px;
