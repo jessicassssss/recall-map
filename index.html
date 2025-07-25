@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>2025 Taiwan Legislature Recall Map</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin:0; padding:0; font-family:Arial, sans-serif; background:#fafbfc;}
@@ -10,97 +11,100 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 0 0 0;
-      position: relative;
+      padding-top: 8px;
+      padding-bottom: 2px;
       background: #fff;
     }
     .logo {
-      max-height: 44px;
-      margin: 0 12px;
+      max-height: 32px;
+      margin: 0 auto;
+      display: block;
     }
     .lang-select {
       position: fixed;
-      top: 18px;
-      right: 20px;
-      z-index: 2000;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      padding: 6px 12px;
-      font-size: 15px;
+      border-radius: 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      padding: 3px 9px;
+      font-size: 13px;
       border: 1px solid #ddd;
     }
-    @media (max-width: 600px) {
-      .topbar { padding: 5px 0 0 0;}
-      .logo { max-height: 32px;}
-      .lang-select { top: 8px; right: 8px; font-size:13px;}
-      .btn-group button { width: 100%; margin:6px 0 0 0; font-size:15px; }
-      h2 { font-size: 18px; }
-    }
     .btn-group {
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .btn-group button {
-      padding: 10px 20px;
-      margin-right: 0;
+      padding: 8px 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 7px;
       background: #e8eefa;
       cursor: pointer;
       font-weight: bold;
+      font-size:15px;
       transition: background 0.2s;
     }
     .btn-group button:hover { background: #cbe2fa; }
-    #map { height: 60vh; min-height:400px; width:100%; margin-top:8px; z-index:1; }
-    .popup-chart { width:160px; height:160px; display:block; margin:auto; }
-    .popup-info { font-size: 15px; line-height: 1.5; text-align: left; word-break:break-all; }
-    .popup-small { font-size: 12px; margin-top: 10px; text-align: center; }
-    /* loading spinner */
+    h2 {
+      text-align:center;
+      margin: 9px 0 12px 0;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    #map { 
+      height: 63vh; 
+      min-height:350px; 
+      width:100%; 
+      margin-top:2px; 
+      z-index:1; 
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 2px 16px rgba(64,90,110,0.06);
+    }
+    .popup-chart { width:150px; height:150px; display:block; margin:auto; }
+    .popup-info { 
+      font-size: 18px;  /* 手機友善字體 */
+      line-height: 1.6; 
+      text-align: left; 
+      word-break:break-all; 
+      font-weight: 500;
+    }
+    .popup-small { font-size: 15px; margin-top: 10px; text-align: center; font-weight:bold; }
     #loading {
       display: flex;
       justify-content: center;
       align-items: center;
       position: fixed;
       left:0; top:0; width:100vw; height:100vh;
-      background:rgba(255,255,255,0.88);
+      background:rgba(255,255,255,0.94);
       z-index:3000;
-      font-size: 22px;
+      font-size: 18px;
       color: #1976d2;
       font-weight: bold;
       flex-direction: column;
       pointer-events: none;
     }
-    #resetView {
-      position:fixed;
-      left:20px; bottom:20px;
-      z-index:1200;
-      background: #fff;
-      border: 1px solid #1976d2;
-      color: #1976d2;
-      border-radius: 28px;
-      padding: 8px 20px;
-      font-size: 16px;
-      cursor:pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
-      font-weight:bold;
-      transition: background 0.2s;
-    }
-    #resetView:hover { background:#f3f7fa; }
-    @media (max-width:600px){
-      #resetView { left:10px; bottom:10px; font-size:15px; padding: 7px 16px;}
+    @media (max-width: 700px) {
+      .logo { max-height: 25px;}
+      .lang-select { font-size:11.5px; top: 5px; right: 5px;}
+      .btn-group button { font-size:13px; padding:7px 9px;}
+      h2 { font-size:15px; }
+      #map { height: 59vh; min-height:250px;}
+      .popup-info { font-size:16.5px; }
+      .popup-small { font-size:13.5px;}
+      #loading { font-size:15px;}
     }
   </style>
 </head>
 <body>
-  <!-- LOGO + 標題 -->
   <div class="topbar">
     <img class="logo" src="https://www.rti.org.tw/en/Static/image/enLogo.png" alt="RTI logo">
   </div>
-  <!-- 語言選單 -->
   <select class="lang-select" onchange="if(this.value) window.location.href=this.value;">
     <option value="">🌏 Language / 語言</option>
     <option value="https://jessicassssss.github.io/recall-map/" selected>English</option>
@@ -111,14 +115,13 @@
     <option value="https://jessicassssss.github.io/recall-map-vn/">Tiếng Việt</option>
     <option value="https://jessicassssss.github.io/recall-map-kr/">한국어</option>
   </select>
-  <h2 style="text-align:center; margin-bottom:10px;">2025 Taiwan Legislature Recall Map</h2>
+  <h2>2025 Taiwan Legislature Recall Map</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Show All</button>
     <button onclick="filterByDate('07/26')">July 26 Cases</button>
     <button onclick="filterByDate('08/23')">August 23 Cases</button>
   </div>
   <div id="map"></div>
-  <button id="resetView" onclick="resetView()">Reset View</button>
   <div id="loading"><div>Loading map...</div>
     <svg width="52" height="52" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#1976d2" stroke-width="4" stroke-linecap="round" stroke-dasharray="90 30" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1.2s" keyTimes="0;1" values="0 22 22;360 22 22"></animateTransform></circle></svg>
   </div>
@@ -127,10 +130,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    // loading
     document.getElementById('loading').style.display = 'flex';
     const map = L.map('map').setView([23.8, 121], 7);
-    let initialView = [23.8, 121], initialZoom = 7;
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
@@ -167,7 +168,7 @@
             fillOpacity: 0.6
           }).addTo(map);
 
-          // 點 popup 內容複製（UX亮點）
+          // popup 字體加大，手機也清楚
           const popupHTML = `
             <div class="popup-info" style="user-select:all; cursor:pointer;" title="Click to copy">
               <strong>${row.Name || ''} (${row.Date || ''})</strong><br>
@@ -184,7 +185,6 @@
           `;
           marker.bindPopup(popupHTML);
 
-          // Popup點擊內容複製
           marker.on('popupopen', () => {
             const div = document.getElementById(cid).parentElement;
             div.onclick = function() {
@@ -224,11 +224,6 @@
           ? m.addTo(map)
           : map.removeLayer(m);
       });
-      // 點選過後自動縮回全圖
-      setTimeout(()=>{ resetView(); },300);
-    }
-    function resetView() {
-      map.setView(initialView, initialZoom);
     }
   </script>
 </body>
