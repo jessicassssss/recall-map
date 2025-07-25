@@ -99,7 +99,7 @@
               Disagree: ${formatNumber(row["Disagree"])}<br>
               <strong>Results: ${row["Results"] || 'N/A'}</strong><br>
               <br>
-              <div class="popup-small"><strong>% of Votes in 2024</strong></div>
+              <div class="popup-small"><strong>Votes in 2024</strong></div>
               <canvas id="${cid}" class="popup-chart"></canvas>
             </div>
           `;
@@ -109,7 +109,7 @@
             new Chart(document.getElementById(cid).getContext('2d'), {
               type: 'pie',
               data: {
-                labels: ['Turnout (%)', 'Others'],
+                labels: ['win', 'Others'],
                 datasets: [{
                   data: [rate, rest],
                   backgroundColor: ['#007bff', '#e9ecef']
