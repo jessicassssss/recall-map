@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SVG 互動範例</title>
+  <style>
+    .st0 { transition: fill 0.2s, stroke 0.2s; cursor: pointer; }
+    .st0:hover, .st0.active { fill: orange !important; stroke: red !important; }
+    #infoBox { margin-top: 16px; font-size: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+<!-- SVG 區塊開始 -->
+<svg version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" viewBox="0 0 953.9 1024" style="enable-background:new 0 0 953.9 1024;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F6F6F6;stroke:#CCCCCC;stroke-width:2;stroke-miterlimit:10;}
+</style>
+<path class="st0" d="M171.7,477.6c0,0,29.8-17.5,43.3-26c13.5-8.5,18.3-15.2,21-19.1c2.8-3.9,13.2-19.5,22.6-23.1
+	c9.4-3.6,21.8-6.1,29.8-5.1c8,1,32.2,13.8,41.5,21.8c9.3,8,24.1,29.5,24.1,29.5s16.3,12.6,28.2,20.2c11.9,7.6,28.9,13.1,28.9,13.1
+	l-21.2,20.3c0,0-24.6,2.7-37.7,3.9c-13.1,1.2-47.8,6.6-53.2,6.5c-5.5-0.1-25.5-3.2-25.5-3.2s-25.8-7.9-32.8-9.8
+	c-7-1.9-26.3-10.5-26.3-10.5L171.7,477.6z"/>
+<path class="st0" d="M358.2,481.9c0,0,15.3-19.8,22.4-25.5c7-5.8,22.2-14.2,27.6-15.6c5.4-1.4,28.6-7,36.6-7.2
+	c8-0.1,23.9,4.8,29.1,8.1c5.2,3.3,15.9,9.7,20.1,17.2c4.2,7.5,7.7,13.7,8.6,17.1c0.9,3.4,3.2,16.7,3.2,16.7l2.3,8.2l-15.1,2.6
+	c0,0-22.6,0.5-27.1,0.5c-4.5,0-23.8-3.4-23.8-3.4l-17.9-1.1l-20.7-7.7L358.2,481.9z"/>
+<path class="st0" d="M513.7,475.7c0,0-1.5-13.7,0.5-17.2c2-3.5,10.4-13.8,16.2-16.3c5.8-2.5,24.1-5.8,30.1-5.7
+	c6,0.1,25.7,4.3,31.5,9.4c5.8,5.1,15.6,17.4,15.6,17.4l-0.1,9.8c0,0-5.7,13.8-8.2,16.8c-2.5,3-18.2,13.1-18.2,13.1l-10.6-2.6
+	l-25.5-6.2L513.7,475.7z"/>
+<path class="st0" d="M601.1,477.9c0,0,5.7-16.6,9.8-21.4c4.1-4.8,16.6-13.7,21.8-15.2c5.2-1.5,23.7-3.7,29.1-2.5
+	c5.4,1.2,23.1,7.1,27.8,10.7c4.7,3.6,17.4,17.2,17.4,17.2s6.1,13.6,6.4,17c0.3,3.4,0.5,12.8,0.5,12.8l-19,1.9l-18.9-3.7l-18.8-6.4
+	l-20.8-4.5L601.1,477.9z"/>
+<path class="st0" d="M693.2,481.6c0,0,9.6-15.7,16.2-20.6c6.6-4.9,28.4-14.2,33.5-14.5c5.1-0.3,31.6,4.5,36.5,6.7
+	c4.9,2.2,19.4,14.6,23.8,20.1c4.4,5.5,14.3,24.2,14.3,24.2l-19.3,11c0,0-14.7,2.4-19.2,2.3c-4.5-0.1-21.2-2.1-21.2-2.1
+	s-23.7-8.5-28.8-9.5c-5.1-1-19.6-6.1-19.6-6.1L693.2,481.6z"/>
+<!-- ...你可以把更多 path 貼進來... -->
+</svg>
+<!-- SVG 區塊結束 -->
+
+<div id="infoBox">請點選或滑過地圖區塊</div>
+<script>
+  // 自動標示所有區塊的名稱
+  document.querySelectorAll('.st0').forEach((p, idx) => {
+    p.dataset.areaName = `區塊 ${idx + 1}`;
+    // hover 高亮
+    p.addEventListener('mouseenter', () => {
+      p.classList.add('active');
+      document.getElementById('infoBox').textContent = p.dataset.areaName;
+    });
+    p.addEventListener('mouseleave', () => {
+      p.classList.remove('active');
+      document.getElementById('infoBox').textContent = "請點選或滑過地圖區塊";
+    });
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.st0').forEach(e=>e.classList.remove('active'));
+      p.classList.add('active');
+      document.getElementById('infoBox').textContent = `${p.dataset.areaName}（已選取）`;
+    });
+  });
+</script>
+</body>
+</html>
