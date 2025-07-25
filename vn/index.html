@@ -4,25 +4,25 @@
   <meta charset="UTF-8" />
   <title>Bản đồ Bãi nhiệm Ủy viên Lập pháp Đài Loan năm 2025</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <meta name="description" content="Bản đồ tương tác các khu vực bỏ phiếu bãi nhiệm nghị sĩ Lập pháp viện Đài Loan 2025.">
-  <meta name="keywords" content="bãi nhiệm, Đài Loan, 2025, nghị sĩ, bản đồ, phiếu bầu, lập pháp, chính trị, KMT, DPP, TPP">
+  <meta name="description" content="Bản đồ trực quan hóa các cuộc bỏ phiếu bãi nhiệm Ủy viên Lập pháp tại Đài Loan năm 2025.">
+  <meta name="keywords" content="bãi nhiệm, Đài Loan, 2025, lập pháp, bản đồ, bỏ phiếu, chính trị">
   <meta name="author" content="Radio Taiwan International RTI">
   <link rel="canonical" href="https://jessicassssss.github.io/recall-map-vn/" />
   <meta property="og:type" content="website">
   <meta property="og:title" content="Bản đồ Bãi nhiệm Ủy viên Lập pháp Đài Loan năm 2025">
-  <meta property="og:description" content="Bản đồ tương tác các khu vực bỏ phiếu bãi nhiệm nghị sĩ Lập pháp viện Đài Loan 2025.">
+  <meta property="og:description" content="Bản đồ trực quan hóa các cuộc bỏ phiếu bãi nhiệm Ủy viên Lập pháp tại Đài Loan năm 2025.">
   <meta property="og:image" content="https://www.ntdtv.com.tw/public/uploads/assets/2025/07/22/2025-07-22-687f18ac71ab6-780x438-169.jpg">
   <meta property="og:url" content="https://jessicassssss.github.io/recall-map-vn/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bản đồ Bãi nhiệm Ủy viên Lập pháp Đài Loan năm 2025">
-  <meta name="twitter:description" content="Bản đồ tương tác các khu vực bỏ phiếu bãi nhiệm nghị sĩ Lập pháp viện Đài Loan 2025.">
+  <meta name="twitter:description" content="Bản đồ trực quan hóa các cuộc bỏ phiếu bãi nhiệm Ủy viên Lập pháp tại Đài Loan năm 2025.">
   <meta name="twitter:image" content="https://www.ntdtv.com.tw/public/uploads/assets/2025/07/22/2025-07-22-687f18ac71ab6-780x438-169.jpg">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Bản đồ Bãi nhiệm Ủy viên Lập pháp Đài Loan năm 2025",
-    "description": "Bản đồ tương tác các khu vực bỏ phiếu bãi nhiệm nghị sĩ Lập pháp viện Đài Loan 2025.",
+    "description": "Bản đồ trực quan hóa các cuộc bỏ phiếu bãi nhiệm Ủy viên Lập pháp tại Đài Loan năm 2025.",
     "url": "https://jessicassssss.github.io/recall-map-vn/",
     "image": "https://www.ntdtv.com.tw/public/uploads/assets/2025/07/22/2025-07-22-687f18ac71ab6-780x438-169.jpg"
   }
@@ -200,16 +200,16 @@
   <div class="lang-ui-box">
     <select class="lang-select" onchange="if(this.value) window.location.href=this.value;">
       <option value="">🌏 Language / 語言</option>
-      <option value="https://jessicassssss.github.io/recall-map/">English</option>
-      <option value="https://jessicassssss.github.io/recall-map-fr/">Français</option>
-      <option value="https://jessicassssss.github.io/recall-map-es/">Español</option>
-      <option value="https://jessicassssss.github.io/recall-map-de/">Deutsch</option>
-      <option value="https://jessicassssss.github.io/recall-map-ru/">Русский</option>
-      <option value="https://jessicassssss.github.io/recall-map-vn/" selected>Tiếng Việt</option>
-      <option value="https://jessicassssss.github.io/recall-map-kr/">한국어</option>
+      <option value="https://jessicassssss.github.io/recall-map/en/">English</option>
+      <option value="https://jessicassssss.github.io/recall-map/fr/">Français</option>
+      <option value="https://jessicassssss.github.io/recall-map/es/">Español</option>
+      <option value="https://jessicassssss.github.io/recall-map/de/">Deutsch</option>
+      <option value="https://jessicassssss.github.io/recall-map/ru/">Русский</option>
+      <option value="https://jessicassssss.github.io/recall-map/vn/" selected>Tiếng Việt</option>
+      <option value="https://jessicassssss.github.io/recall-map/kr/">한국어</option>
     </select>
   </div>
-  <button class="mode-fab" id="toggleModeBtn" title="Chuyển đổi sáng/tối" aria-label="Toggle theme">🌙</button>
+  <button class="mode-fab" id="toggleModeBtn" title="Chuyển đổi chế độ sáng/tối" aria-label="Toggle theme">🌙</button>
   <h2>Bản đồ Bãi nhiệm Ủy viên Lập pháp Đài Loan năm 2025</h2>
   <div class="btn-group">
     <button onclick="filterByDate('all')">Hiển thị tất cả</button>
@@ -273,6 +273,7 @@
           if (isNaN(lat) || isNaN(lng)) return;
 
           const cid = 'chart' + i;
+          // Hỗ trợ số thập phân và % trong tiếng Việt
           const tyLeStr = (row["Tỷ lệ cử tri đi bầu năm 2024"] || '').replace('%', '').replace(',', '.');
           const rate = parseFloat(tyLeStr) || 0;
           const rest = Math.max(0, 100 - rate);
@@ -289,7 +290,7 @@
           }).addTo(map);
 
           const popupHTML = `
-            <div class="popup-info" style="user-select:all; cursor:pointer;" title="Nhấn để sao chép">
+            <div class="popup-info" style="user-select:all; cursor:pointer;" title="Bấm để sao chép">
               <strong>${row["Họ tên"] || ''} (${row.Date || ''})</strong><br>
               Đảng phái: ${row["Đảng phái"] || ''}<br>
               Tổng số cử tri: ${formatNumber(row["Tổng số cử tri"])}<br>
@@ -309,7 +310,7 @@
             div.onclick = function() {
               navigator.clipboard.writeText(div.innerText.replace(/\s+/g, ' ').trim());
               div.title = "Đã sao chép!";
-              setTimeout(()=>{ div.title = "Nhấn để sao chép"; },1000);
+              setTimeout(()=>{ div.title = "Bấm để sao chép"; },1000);
             };
             new Chart(document.getElementById(cid).getContext('2d'), {
               type: 'pie',
@@ -329,5 +330,21 @@
           });
 
           marker.rowDate = row.Date;
-          markers.push
+          markers.push(marker);
+        });
 
+        document.getElementById('loading').style.display = 'none';
+        filterByDate('all');
+      }
+    });
+
+    function filterByDate(date) {
+      markers.forEach(m => {
+        (date === 'all' || m.rowDate === date)
+          ? m.addTo(map)
+          : map.removeLayer(m);
+      });
+    }
+  </script>
+</body>
+</html>
