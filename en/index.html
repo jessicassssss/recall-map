@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     :root {
-      --topbar-h: 46px;    /* logo區高度 */
-      --btn-h: 44px;       /* 功能鈕高度 */
-      --h2-h: 30px;        /* 標題高度 */
-      --gap: 16px;         /* 內部間隔 */
+      --topbar-h: 46px;
+      --btn-h: 44px;
+      --h2-h: 30px;
+      --gap: 16px;
     }
     body.dark, :root.dark {
       --bg-main: #181c20;
@@ -118,8 +118,7 @@
       height: var(--h2-h);
       line-height: var(--h2-h);
     }
-    #map { 
-      /* 桌機滿版: 扣掉logo、標題、btn、gap等 */
+    #map {
       height: calc(100vh - var(--topbar-h) - var(--btn-h) - var(--h2-h) - var(--gap));
       min-height:300px;
       width:100%;
@@ -261,27 +260,20 @@
             return Number(num || 0).toLocaleString('en-US');
           }
 
-          const marker = L.circleMarker([lat, lng], {
-            radius: 8,
-            color: row.Color || 'gray',
-            fillColor: row.Color || 'gray',
-            fillOpacity: 0.6
-          }).addTo(map);
-
-          const popupHTML = 
+          const popupHTML = `
             <div class="popup-info" style="user-select:all; cursor:pointer;" title="Click to copy">
               <strong>${row.Name || ''} (${row.Date || ''})</strong><br>
               Party: ${row.Party || ''}<br>
-              Electorate: ${formatNumber(row["Electorate"])}<br>
+              Electorate: ${formatNumber(row.Electorate)}<br>
               25% Threshold: ${formatNumber(row["25% Threshold"])}<br>
-              Agree: ${formatNumber(row["Agree"])}<br>
-              Disagree: ${formatNumber(row["Disagree"])}<br>
-              <strong>Results: ${row["Results"] || 'N/A'}</strong><br>
+              Agree: ${formatNumber(row.Agree)}<br>
+              Disagree: ${formatNumber(row.Disagree)}<br>
+              <strong>Results: ${row.Results || 'N/A'}</strong><br>
               <br>
-              <div class="popup-small"><strong>% of Votes in 2024</strong></div>
+              <div class="popup-small"><strong>Elected (%)</strong></div>
               <canvas id="${cid}" class="popup-chart"></canvas>
             </div>
-          ;
+          `;
           marker.bindPopup(popupHTML);
 
           marker.on('popupopen', () => {
