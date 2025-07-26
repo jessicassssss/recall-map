@@ -278,9 +278,13 @@
           const rate = parseFloat(pctStr) || 0;
           const rest = Math.max(0, 100 - rate);
 
-          function formatNumber(num) {
-            return Number(num || 0).toLocaleString('es-ES');
-          }
+         function formatNumber(num) {
+           return Number(num || 0)
+            .toFixed(0)                         // 取整數
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // 每 3 位插入空格
+}
+
+
 
           const marker = L.circleMarker([lat, lng], {
             radius: 8,
