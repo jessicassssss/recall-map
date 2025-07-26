@@ -11,21 +11,21 @@
 </head>
 <body>
   <div id="map"></div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script src="https://unpkg.com/topojson-client@3"></script>
 
   <script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
+    const TOPOJSON_URL = "https://jessicassssss.github.io/recall-map/data/districts-mercator-10t.json";
+
     const map = L.map('map').setView([23.8, 121], 7);
+
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(map);
-
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
-    const TOPOJSON_URL = "https://jessicassssss.github.io/recall-map/data/districts-mercator-10t.json";
 
     const districtDataMap = {};
 
@@ -33,41 +33,43 @@
       download: true,
       header: true,
       complete: function(results) {
-        const rows = results.data.slice(12, 18); // 13~18列
+        const rows = results.data.slice(12, 18);
         rows.forEach(row => {
           if (row["Name"]) {
             districtDataMap[row["Name"].trim()] = row;
           }
         });
-        loadMap();
+        loadDistricts();
       }
     });
 
-    function loadMap() {
+    function loadDistricts() {
       fetch(TOPOJSON_URL)
         .then(res => res.json())
         .then(topoData => {
-          const geojson = topojson.feature(topoData, topoData.objects.districts);
+          const objectName = Object.keys(topoData.objects)[0];
+          const geojson = topojson.feature(topoData, topoData.objects[objectName]);
+
           L.geoJSON(geojson, {
             style: {
-              color: "#333",
+              color: "#000",
               weight: 1,
-              fillOpacity: 0.4,
-              fillColor: "#6699cc"
+              fillOpacity: 0.6,
+              fillColor: "#ffcc00"
             },
             onEachFeature: function (feature, layer) {
-              const name = feature.properties.name;
-              const row = districtDataMap[name];
+              const id = feature.properties.name;
+              const row = districtDataMap[id];
               if (row) {
-                const popup = `
+                const popupContent = `
                   <strong>${row["Name"]}</strong><br>
-                  📅 Date: ${row["Date"]}<br>
-                  🏛️ Party: ${row["Party"]}<br>
-                  ✅ Result: <strong>${row["Results"]}</strong>
+                  Date: ${row["Date"]}<br>
+                  Party: ${row["Party"]}<br>
+                  Result: <strong>${row["Results"]}</strong>
                 `;
-                layer.bindPopup(popup);
+                layer.bindPopup(popupContent);
               } else {
-                layer.bindPopup(`<strong>${name}</strong><br>🔍 No matching data.`);
+                layer.bindPopup(`<strong>${id}</strong><br>No data found.`);
               }
             }
           }).addTo(map);
