@@ -1,80 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Recall Map Results</title>
+  <meta charset="UTF-8" />
+  <title>Recall SVG Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    #map { height: 100vh; width: 100%; }
+    html, body { margin: 0; padding: 0; height: 100%; background: #f9f9f9; font-family: sans-serif; }
+    #mapContainer { width: 100%; height: 100vh; position: relative; }
+    #svgMap { width: 100%; height: 100%; border: none; }
+    .popup {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-  <script src="https://unpkg.com/topojson-client@3"></script>
+  <div id="mapContainer">
+    <object id="svgMap" type="image/svg+xml" data="https://jessicassssss.github.io/recall-map/data/recall-districts.svg"></object>
+    <div id="popup" class="popup"></div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQoU8mUSfNo-u54-3sVevNDp59orI5WJSIiiKimGFYQ581z3Yh7V0DzdE7cDy4vLKwwoy99ud8EiMCm/pub?output=csv";
-    const TOPOJSON_URL = "https://jessicassssss.github.io/recall-map/data/districts-mercator-10t.json";
-
-    const map = L.map('map').setView([23.8, 121], 7);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
-
     const districtDataMap = {};
 
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
       complete: function(results) {
-        const rows = results.data.slice(12, 18);
+        const rows = results.data.slice(12, 18); // 13–18列
         rows.forEach(row => {
-          if (row["Name"]) {
-            districtDataMap[row["Name"].trim()] = row;
-          }
+          const name = row["Name"]?.trim();
+          if (name) districtDataMap[name] = row;
         });
-        loadDistricts();
+        setupSVG();
       }
     });
 
-    function loadDistricts() {
-      fetch(TOPOJSON_URL)
-        .then(res => res.json())
-        .then(topoData => {
-          const objectName = Object.keys(topoData.objects)[0];
-          const geojson = topojson.feature(topoData, topoData.objects[objectName]);
-
-          L.geoJSON(geojson, {
-            style: {
-              color: "#000",
-              weight: 1,
-              fillOpacity: 0.6,
-              fillColor: "#ffcc00"
-            },
-            onEachFeature: function (feature, layer) {
-              const id = feature.properties.name;
-              const row = districtDataMap[id];
-              if (row) {
-                const popupContent = `
-                  <strong>${row["Name"]}</strong><br>
-                  Date: ${row["Date"]}<br>
-                  Party: ${row["Party"]}<br>
-                  Result: <strong>${row["Results"]}</strong>
-                `;
-                layer.bindPopup(popupContent);
-              } else {
-                layer.bindPopup(`<strong>${id}</strong><br>No data found.`);
-              }
-            }
-          }).addTo(map);
+    function setupSVG() {
+      const svgObj = document.getElementById('svgMap');
+      svgObj.addEventListener('load', () => {
+        const svgDoc = svgObj.contentDocument;
+        const paths = svgDoc.querySelectorAll('path[id]');
+        paths.forEach(path => {
+          path.style.cursor = 'pointer';
+          path.addEventListener('click', event => {
+            const id = path.id;
+            const row = districtDataMap[id];
+            showPopup(event, row, id);
+          });
         });
+      });
     }
+
+    function showPopup(event, row, fallbackId) {
+      const popup = document.getElementById('popup');
+      if (row) {
+        popup.innerHTML = `
+          <strong>${row["Name"]}</strong><br>
+          Date: ${row["Date"]}<br>
+          Party: ${row["Party"]}<br>
+          Result: <strong>${row["Results"]}</strong>
+        `;
+      } else {
+        popup.innerHTML = `<strong>${fallbackId}</strong><br>No data found`;
+      }
+      const svgObj = document.getElementById('svgMap');
+      const bounds = svgObj.getBoundingClientRect();
+      popup.style.left = `${event.clientX - bounds.left + 10}px`;
+      popup.style.top = `${event.clientY - bounds.top + 10}px`;
+      popup.style.display = 'block';
+    }
+
+    // 點背景隱藏 popup
+    window.addEventListener('click', e => {
+      const popup = document.getElementById('popup');
+      if (!e.target.closest('path')) {
+        popup.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
